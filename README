@@ -1,0 +1,59 @@
+# 🌍 Places You've Been
+
+This project is a simple website to track and display all the places you've visited. Each place is stored as an object with properties such as location, landmarks, time of year visited, and personal notes.
+
+---
+
+## 📌 Features
+
+- Add a new place with:
+  - `Location`
+  - `Landmarks`
+  - `Time of Year`
+  - `Notes`
+- View detailed information when clicking on a place name
+- All business logic is developed using **Test-Driven Development (TDD)**
+
+---
+
+## 🧠 Business Logic
+
+All place data is managed using the `Place` class defined in `src/place.js`.
+
+### Class: `Place`
+
+| Property      | Description                            |
+|---------------|----------------------------------------|
+| `location`    | The name of the place                  |
+| `landmarks`   | Array of notable landmarks             |
+| `timeOfYear`  | Season or month you visited            |
+| `notes`       | Any personal notes or experiences      |
+
+#### Method:
+- `getSummary()`: Returns a short string summary like `“Paris in Spring: Visited the Eiffel Tower.”`
+
+---
+
+## ✅ Test-Driven Development
+
+We used **Jest** to write and run tests. Tests are located in `src/place.test.js`.
+
+### Sample Tests
+
+```js
+import { Place } from './place';
+
+describe('Place', () => {
+  it('should create a place with the correct properties', () => {
+    const place = new Place('Rome', ['Colosseum'], 'Summer', 'Lots of tourists!');
+    expect(place.location).toBe('Rome');
+    expect(place.landmarks).toEqual(['Colosseum']);
+    expect(place.timeOfYear).toBe('Summer');
+    expect(place.notes).toBe('Lots of tourists!');
+  });
+
+  it('should return a proper summary string', () => {
+    const place = new Place('Tokyo', ['Shibuya'], 'Spring', 'Cherry blossoms everywhere.');
+    expect(place.getSummary()).toBe('Tokyo in Spring: Cherry blossoms everywhere.');
+  });
+});

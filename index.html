@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Address Book</title>
+</head>
+<body>
+  <h1>My Address Book</h1>
+
+  <form id="contact-form">
+    <input type="text" id="first-name" placeholder="First Name" required>
+    <input type="text" id="last-name" placeholder="Last Name" required>
+    <input type="text" id="phone" placeholder="Phone Number" required>
+    <button type="submit">Add Contact</button>
+  </form>
+
+  <ul id="contact-list"></ul>
+
+  <script>
+    let contacts = [];
+
+    function saveContacts() {
+      localStorage.setItem("contacts", JSON.stringify(contacts));
+    }
+
+    function loadContacts() {
+      const saved = localStorage.getItem("contacts");
+      if (saved) {
+        contacts = JSON.parse(saved);
+      }
+    }
+
+    function displayContacts() {
+      const list = document.getElementById("contact-list");
+      list.innerHTML = "";
+      contacts.forEach(function(contact) {
+        const li = document.createElement("li");
+        li.textContent = contact.firstName + " " + contact.lastName + " - " + contact.phone;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById("contact-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const firstName = document.getElementById("first-name").value;
+      const lastName = document.getElementById("last-name").value;
+      const phone = document.getElementById("phone").value;
+
+      contacts.push({ firstName, lastName, phone });
+      saveContacts();
+      displayContacts();
+      document.getElementById("contact-form").reset();
+    });
+
+    window.addEventListener("load", function() {
+      loadContacts();
+      displayContacts();
+    });
+  </script>
+
+  <h style="background-color: red;;">
+    FOOTPRINT
+  </h2>
+  <br>
+  <section>
+    <div>
+      <input type="text" id="search" placeholder="Enter Location" required>
+      <p><button>Submit</button></p>
+    </div>
+    
+  </section>
+</body>
+</html>
