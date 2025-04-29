@@ -1,21 +1,18 @@
-.place-form{
-    body {
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: auto;
-        padding: 1rem;
-      }
-      
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-      
-      #place-details {
-        margin-top: 1rem;
-        padding: 1rem;
-        border: 1px solid #ddd;
-        background: #f9f9f9;
-      }
+.h1{
+    background-color: red;
+    text-align: center;
+    border: 20px;
+    margin-top: 10px;
+}
+.h2 {
+    background-color: chocolate;
+    text-align: center;
+    border: 20px;
+    margin-top: 10px;
+}
+.footer{
+    border: 100px;
+    background-color:blueviolet ;
+    text-align: center;
+    height: 50px;
 }

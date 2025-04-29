@@ -3,163 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <title>Simple Address Book</title>
+  <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
-  <h1>My Address Book</h1>
-
-  <form id="contact-form">
+    <div>
+  <h1 class="h1">My Address Book</h1>
+  <!-- Address Book Form -->
+<form id="contact-form">
     <input type="text" id="first-name" placeholder="First Name" required>
     <input type="text" id="last-name" placeholder="Last Name" required>
     <input type="text" id="phone" placeholder="Phone Number" required>
     <button type="submit">Add Contact</button>
   </form>
-
+  
+  <h2 class="h2">Search Contact by Phone</h2>
+  <input type="text" id="contact-search-input" placeholder="Enter phone number" />
+  <button id="contact-search-btn">Search</button>
+  
   <ul id="contact-list"></ul>
-
+  
   <script>
-    let contacts = [];
-
-    function saveContacts() {
-      localStorage.setItem("contacts", JSON.stringify(contacts));
-    }
-
-    function loadContacts() {
-      const saved = localStorage.getItem("contacts");
-      if (saved) {
-        contacts = JSON.parse(saved);
+    let contacts = loadContactsFromStorage();
+  
+    const contactForm = document.getElementById('contact-form');
+    const contactList = document.getElementById('contact-list');
+    const contactSearchInput = document.getElementById('contact-search-input');
+    const contactSearchBtn = document.getElementById('contact-search-btn');
+  
+    window.addEventListener('load', displayContacts);
+  
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+  
+      const firstName = document.getElementById('first-name').value.trim();
+      const lastName = document.getElementById('last-name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+  
+      if (!firstName || !lastName || !phone) {
+        alert('All fields required');
+        return;
       }
-    }
-
+  
+      contacts.push({ firstName, lastName, phone });
+      saveContactsToStorage(contacts);
+      contactForm.reset();
+      displayContacts();
+    });
+  
     function displayContacts() {
-      const list = document.getElementById("contact-list");
-      list.innerHTML = "";
-      contacts.forEach(function(contact) {
-        const li = document.createElement("li");
-        li.textContent = contact.firstName + " " + contact.lastName + " - " + contact.phone;
-        list.appendChild(li);
+      contactList.innerHTML = '';
+      contacts.forEach((contact) => {
+        const li = document.createElement('li');
+        li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.phone}`;
+        contactList.appendChild(li);
       });
     }
-
-    document.getElementById("contact-form").addEventListener("submit", function(event) {
-      event.preventDefault();
-      const firstName = document.getElementById("first-name").value;
-      const lastName = document.getElementById("last-name").value;
-      const phone = document.getElementById("phone").value;
-
-      contacts.push({ firstName, lastName, phone });
-      saveContacts();
-      displayContacts();
-      document.getElementById("contact-form").reset();
-    });
-
-    window.addEventListener("load", function() {
-      loadContacts();
-      displayContacts();
+  
+    function saveContactsToStorage(data) {
+      localStorage.setItem('contacts', JSON.stringify(data));
+    }
+  
+    function loadContactsFromStorage() {
+      const data = localStorage.getItem('contacts');
+      return data ? JSON.parse(data) : [];
+    }
+  
+    contactSearchBtn.addEventListener('click', function () {
+      const query = contactSearchInput.value.trim();
+      if (!query) return;
+  
+      const found = contacts.find(c => c.phone === query);
+      if (found) {
+        alert(`Found: ${found.firstName} ${found.lastName} - ${found.phone}`);
+      } else {
+        alert("No contact found with that phone number.");
+      }
     });
   </script>
+  
 
-  <h style="background-color: red;;">
-    FOOTPRINT
-  </h2>
-  <br>
-  <section>
-    <form id="place-form">
-        <input type="text" id="location" placeholder="Location" required />
-        <input type="text" id="landmarks" placeholder="Landmarks" />
-        <input type="text" id="timeOfYear" placeholder="Time of Year" />
-        <textarea id="notes" placeholder="Notes"></textarea>
-        <button type="submit">Add Place</button>
-      </form>
-    
-      <h2>Your Places</h2>
-      <ul id="place-list"></ul>
+  
+</div>
 
-      <h2>Search Places</h2>
-<input type="text" id="search-input" placeholder="Enter place name to search" />
-<div>
-    <button id="search-btn">Search</button>
+<h2 class="h2">MY FOOTPRINT</h2>
+<section>
+  <form id="place-form">
+    <input type="text" id="location" placeholder="Location" required />
+    <input type="text" id="landmarks" placeholder="Landmarks (comma-separated)" />
+    <input type="text" id="timeOfYear" placeholder="Time of Year" />
+    <textarea id="notes" placeholder="Notes"></textarea>
+    <button type="submit">Add Place</button>
+  </form>
+
+  <h2 class="h2">Your Places</h2>
+  <ul id="place-list"></ul>
+
+  <h2 class="h2">Search Places</h2>
+  <input type="text" id="place-search-input" placeholder="Enter place name to search" />
+  <div>
+    <button id="place-search-btn">Search</button>
+  </div>
+  <div id="place-details"></div>
+</section>
+
 <script>
-    // Search functionality
-const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
+  class Place {
+    constructor(location, landmarks = [], timeOfYear = '', notes = '') {
+      this.location = location;
+      this.landmarks = landmarks;
+      this.timeOfYear = timeOfYear;
+      this.notes = notes;
+    }
 
-searchBtn.addEventListener('click', function () {
-  const query = searchInput.value.trim().toLowerCase();
-  const match = places.find(place => place.location.toLowerCase() === query);
+    getSummary() {
+      return `${this.location} in ${this.timeOfYear}: ${this.notes}`;
+    }
+  }
 
-  if (match) {
+  const placeForm = document.getElementById('place-form');
+  const placeList = document.getElementById('place-list');
+  const placeDetails = document.getElementById('place-details');
+  const placeSearchInput = document.getElementById('place-search-input');
+  const placeSearchBtn = document.getElementById('place-search-btn');
+
+  let places = loadPlacesFromStorage();
+
+  window.addEventListener('load', () => {
+    places.forEach((place) => addPlaceToList(place));
+  });
+
+  placeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const location = document.getElementById('location').value.trim();
+    const landmarks = document.getElementById('landmarks').value.split(',').map(l => l.trim());
+    const timeOfYear = document.getElementById('timeOfYear').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!location) {
+      alert("Location is required.");
+      return;
+    }
+
+    const newPlace = new Place(location, landmarks, timeOfYear, notes);
+    places.push(newPlace);
+    savePlacesToStorage(places);
+    addPlaceToList(newPlace);
+    placeForm.reset();
+  });
+
+  function addPlaceToList(place) {
+    const li = document.createElement('li');
+    li.textContent = place.location;
+    li.addEventListener('click', () => showPlaceDetails(place));
+    placeList.appendChild(li);
+  }
+
+  function showPlaceDetails(place) {
     placeDetails.innerHTML = `
-      <h3>${match.location}</h3>
-      <p><strong>Landmarks:</strong> ${match.landmarks.join(', ')}</p>
-      <p><strong>Time of Year:</strong> ${match.timeOfYear}</p>
-      <p><strong>Notes:</strong> ${match.notes}</p>
-      <p><em>${match.getSummary()}</em></p>
+      <h3>${place.location}</h3>
+      <p><strong>Landmarks:</strong> ${place.landmarks.join(', ')}</p>
+      <p><strong>Time of Year:</strong> ${place.timeOfYear}</p>
+      <p><strong>Notes:</strong> ${place.notes}</p>
+      <p><em>${place.getSummary()}</em></p>
     `;
-  } else {
-    placeDetails.innerHTML = `<p style="color:red;">No place found with that name.</p>`;
   }
-});
 
+  placeSearchBtn.addEventListener('click', () => {
+    const query = placeSearchInput.value.trim().toLowerCase();
+    if (!query) return;
+
+    const found = places.find(p => p.location.toLowerCase() === query);
+    if (found) {
+      showPlaceDetails(found);
+    } else {
+      placeDetails.innerHTML = `<p style="color: red;">No place found with that name.</p>`;
+    }
+  });
+
+  function savePlacesToStorage(places) {
+    localStorage.setItem('placesData', JSON.stringify(places));
+  }
+
+  function loadPlacesFromStorage() {
+    const data = localStorage.getItem('placesData');
+    return data ? JSON.parse(data).map(
+      obj => new Place(obj.location, obj.landmarks, obj.timeOfYear, obj.notes)
+    ) : [];
+  }
 </script>
-    </div>
-    
-      <div id="place-details"></div>
-    <script>
-        // Business logic
-class Place {
-  constructor(location, landmarks = [], timeOfYear = '', notes = '') {
-    this.location = location;
-    this.landmarks = landmarks;
-    this.timeOfYear = timeOfYear;
-    this.notes = notes;
-  }
 
-  getSummary() {
-    return `${this.location} in ${this.timeOfYear}: ${this.notes}`;
-  }
-}
 
-// UI logic
-const places = [];
-const placeForm = document.getElementById('place-form');
-const placeList = document.getElementById('place-list');
-const placeDetails = document.getElementById('place-details');
-
-placeForm.addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const location = document.getElementById('location').value;
-  const landmarks = document.getElementById('landmarks').value.split(',').map(l => l.trim());
-  const timeOfYear = document.getElementById('timeOfYear').value;
-  const notes = document.getElementById('notes').value;
-
-  const newPlace = new Place(location, landmarks, timeOfYear, notes);
-  places.push(newPlace);
-
-  addPlaceToList(newPlace, places.length - 1);
-
-  placeForm.reset();
-});
-
-function addPlaceToList(place, index) {
-  const li = document.createElement('li');
-  li.textContent = place.location;
-  li.addEventListener('click', () => showPlaceDetails(index));
-  placeList.appendChild(li);
-}
-
-function showPlaceDetails(index) {
-  const place = places[index];
-  placeDetails.innerHTML = `
-    <h3>${place.location}</h3>
-    <p><strong>Landmarks:</strong> ${place.landmarks.join(', ')}</p>
-    <p><strong>Time of Year:</strong> ${place.timeOfYear}</p>
-    <p><strong>Notes:</strong> ${place.notes}</p>
-    <p><em>${place.getSummary()}</em></p>
-  `;
-}
-
-    </script>
   </section>
 </body>
-</html>
+<footer class="footer">
+    &copy; 2025 Martin Mbuba. All rights reserved.
+</footer>
+</html> 
