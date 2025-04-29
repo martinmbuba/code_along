@@ -1,0 +1,21 @@
+.place-form{
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 1rem;
+      }
+      
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      #place-details {
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        background: #f9f9f9;
+      }
+}

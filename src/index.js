@@ -38,3 +38,25 @@
       loadContacts();
       displayContacts();
     });
+
+
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+
+searchBtn.addEventListener('click', function () {
+  const query = searchInput.value.trim().toLowerCase();
+  const match = places.find(place => place.location.toLowerCase() === query);
+
+  if (match) {
+    placeDetails.innerHTML = `
+      <h3>${match.location}</h3>
+      <p><strong>Landmarks:</strong> ${match.landmarks.join(', ')}</p>
+      <p><strong>Time of Year:</strong> ${match.timeOfYear}</p>
+      <p><strong>Notes:</strong> ${match.notes}</p>
+      <p><em>${match.getSummary()}</em></p>
+    `;
+  } else {
+    placeDetails.innerHTML = `<p style="color:red;">No place found with that name.</p>`;
+  }
+});
+

@@ -63,11 +63,103 @@
   </h2>
   <br>
   <section>
-    <div>
-      <input type="text" id="search" placeholder="Enter Location" required>
-      <p><button>Submit</button></p>
+    <form id="place-form">
+        <input type="text" id="location" placeholder="Location" required />
+        <input type="text" id="landmarks" placeholder="Landmarks" />
+        <input type="text" id="timeOfYear" placeholder="Time of Year" />
+        <textarea id="notes" placeholder="Notes"></textarea>
+        <button type="submit">Add Place</button>
+      </form>
+    
+      <h2>Your Places</h2>
+      <ul id="place-list"></ul>
+
+      <h2>Search Places</h2>
+<input type="text" id="search-input" placeholder="Enter place name to search" />
+<div>
+    <button id="search-btn">Search</button>
+<script>
+    // Search functionality
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+
+searchBtn.addEventListener('click', function () {
+  const query = searchInput.value.trim().toLowerCase();
+  const match = places.find(place => place.location.toLowerCase() === query);
+
+  if (match) {
+    placeDetails.innerHTML = `
+      <h3>${match.location}</h3>
+      <p><strong>Landmarks:</strong> ${match.landmarks.join(', ')}</p>
+      <p><strong>Time of Year:</strong> ${match.timeOfYear}</p>
+      <p><strong>Notes:</strong> ${match.notes}</p>
+      <p><em>${match.getSummary()}</em></p>
+    `;
+  } else {
+    placeDetails.innerHTML = `<p style="color:red;">No place found with that name.</p>`;
+  }
+});
+
+</script>
     </div>
     
+      <div id="place-details"></div>
+    <script>
+        // Business logic
+class Place {
+  constructor(location, landmarks = [], timeOfYear = '', notes = '') {
+    this.location = location;
+    this.landmarks = landmarks;
+    this.timeOfYear = timeOfYear;
+    this.notes = notes;
+  }
+
+  getSummary() {
+    return `${this.location} in ${this.timeOfYear}: ${this.notes}`;
+  }
+}
+
+// UI logic
+const places = [];
+const placeForm = document.getElementById('place-form');
+const placeList = document.getElementById('place-list');
+const placeDetails = document.getElementById('place-details');
+
+placeForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const location = document.getElementById('location').value;
+  const landmarks = document.getElementById('landmarks').value.split(',').map(l => l.trim());
+  const timeOfYear = document.getElementById('timeOfYear').value;
+  const notes = document.getElementById('notes').value;
+
+  const newPlace = new Place(location, landmarks, timeOfYear, notes);
+  places.push(newPlace);
+
+  addPlaceToList(newPlace, places.length - 1);
+
+  placeForm.reset();
+});
+
+function addPlaceToList(place, index) {
+  const li = document.createElement('li');
+  li.textContent = place.location;
+  li.addEventListener('click', () => showPlaceDetails(index));
+  placeList.appendChild(li);
+}
+
+function showPlaceDetails(index) {
+  const place = places[index];
+  placeDetails.innerHTML = `
+    <h3>${place.location}</h3>
+    <p><strong>Landmarks:</strong> ${place.landmarks.join(', ')}</p>
+    <p><strong>Time of Year:</strong> ${place.timeOfYear}</p>
+    <p><strong>Notes:</strong> ${place.notes}</p>
+    <p><em>${place.getSummary()}</em></p>
+  `;
+}
+
+    </script>
   </section>
 </body>
 </html>
